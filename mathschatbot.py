@@ -1,14 +1,19 @@
 import streamlit as st
 import sympy as sp
 from sympy import symbols, solve, diff, integrate
-import spacy
+import subprocess
 
-# Install spaCy model (if not already installed)
+# Install spaCy if not already installed
+try:
+    import spacy
+except ImportError:
+    subprocess.run(["pip", "install", "spacy"])
+    import spacy
+
+# Download spaCy model if not already installed
 try:
     nlp = spacy.load('en_core_web_sm')
 except OSError:
-    st.write("Downloading spaCy model...")
-    import subprocess
     subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
     nlp = spacy.load('en_core_web_sm')
 
@@ -65,7 +70,7 @@ def integrate_expression(expr, var):
 def math_chatbot(query):
     math_operation = parse_math_query(query)
     
-    # Extract the mathematical expression from the query (using simple split logic)
+    # Extract the mathematical expression from the query (simple split logic)
     expression = query.split(" ")[-1]  # Extract the last part of the query as the expression
     
     if math_operation == "solve":
