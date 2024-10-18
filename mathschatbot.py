@@ -3,13 +3,19 @@ import sympy as sp
 from sympy import symbols, solve, diff, integrate
 import spacy
 
-# Load spaCy NLP model for text parsing
-nlp = spacy.load('en_core_web_sm')
+# Install spaCy model (if not already installed)
+try:
+    nlp = spacy.load('en_core_web_sm')
+except OSError:
+    st.write("Downloading spaCy model...")
+    import subprocess
+    subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
+    nlp = spacy.load('en_core_web_sm')
 
-# Define symbolic variable for generic math operations
+# Define symbolic variable for math operations
 x = symbols('x')
 
-# Function to parse user input and detect math operation
+# Function to determine what the user wants to do
 def parse_math_query(query):
     doc = nlp(query.lower())
     
@@ -22,7 +28,7 @@ def parse_math_query(query):
     else:
         return "evaluate"
 
-# Evaluate a mathematical expression (like x^2 + 2x)
+# Function to evaluate expressions like "x^2 + 2x"
 def evaluate_expression(expr):
     try:
         result = sp.sympify(expr)
@@ -30,16 +36,16 @@ def evaluate_expression(expr):
     except Exception as e:
         return f"Error: Invalid expression - {e}"
 
-# Solve equations (like solve x^2 + 2x - 3 = 0)
+# Function to solve equations like "x^2 + 2x - 3 = 0"
 def solve_equation(equation, var):
     try:
-        equation = equation.replace("=", "-")  # Adjusting equation format
+        equation = equation.replace("=", "-")  # Adjust the format for solving
         sol = solve(equation, var)
         return sol
     except Exception as e:
         return f"Error: Could not solve - {e}"
 
-# Differentiate expressions (like derivative of x^2)
+# Function to differentiate expressions like "x^2"
 def differentiate_expression(expr, var):
     try:
         derivative = diff(expr, var)
@@ -47,7 +53,7 @@ def differentiate_expression(expr, var):
     except Exception as e:
         return f"Error: Could not differentiate - {e}"
 
-# Integrate expressions (like integral of x^2)
+# Function to integrate expressions like "x^2"
 def integrate_expression(expr, var):
     try:
         integral = integrate(expr, var)
@@ -59,8 +65,9 @@ def integrate_expression(expr, var):
 def math_chatbot(query):
     math_operation = parse_math_query(query)
     
-    # Extract the mathematical expression from the query
-    expression = query.split(" ")[-1]  # Heuristically extracting last part as expression
+    # Extract the mathematical expression from the query (using simple split logic)
+    expression = query.split(" ")[-1]  # Extract the last part of the query as the expression
+    
     if math_operation == "solve":
         return solve_equation(expression, x)
     elif math_operation == "differentiate":
