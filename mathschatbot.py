@@ -1,30 +1,6 @@
-import subprocess
-import importlib
 import streamlit as st
-
-# Function to install missing packages if not already installed
-def install_package(package_name):
-    try:
-        importlib.import_module(package_name)
-    except ImportError:
-        subprocess.run([f"pip", "install", package_name])
-        importlib.import_module(package_name)  # Re-import after installation
-
-# Ensure necessary libraries are installed
-install_package("sympy")
-install_package("spacy")
-
-# Import after ensuring installation
 import sympy as sp
 from sympy import symbols, solve, diff, integrate
-
-# Download the spaCy language model for text processing (if necessary)
-try:
-    import spacy
-    nlp = spacy.load("en_core_web_sm")
-except OSError:
-    subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
-    nlp = spacy.load("en_core_web_sm")
 
 # Define symbolic variable for math operations
 x = symbols('x')
