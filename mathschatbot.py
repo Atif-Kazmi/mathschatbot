@@ -2,18 +2,19 @@ import subprocess
 import importlib
 import streamlit as st
 
-# Function to check and install required packages if they are missing
+# Function to check if a package is installed, and install it if missing
 def install_package(package_name):
     try:
         importlib.import_module(package_name)
     except ImportError:
         subprocess.run(["pip", "install", package_name])
+        importlib.import_module(package_name)  # Re-import after installation
 
-# Ensure necessary packages are installed
+# Ensure SymPy and spaCy are installed
 install_package("sympy")
 install_package("spacy")
 
-# Import required libraries after ensuring installation
+# Import necessary libraries after ensuring installation
 import sympy as sp
 import spacy
 from sympy import symbols, solve, diff, integrate
@@ -30,8 +31,6 @@ x = symbols('x')
 
 # Function to determine what the user wants to do
 def parse_math_query(query):
-    doc = nlp(query.lower())
-    
     if "solve" in query:
         return "solve"
     elif "differentiate" in query or "derivative" in query:
@@ -78,7 +77,7 @@ def integrate_expression(expr, var):
 def math_chatbot(query):
     math_operation = parse_math_query(query)
     
-    # Extract the mathematical expression from the query (using simple split logic)
+    # Extract the mathematical expression from the query (simple split logic)
     expression = query.split(" ")[-1]  # Extract the last part of the query as the expression
     
     if math_operation == "solve":
