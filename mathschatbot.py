@@ -1,14 +1,22 @@
-import streamlit as st
-import sympy as sp
-from sympy import symbols, solve, diff, integrate
 import subprocess
+import importlib
+import streamlit as st
 
-# Install spaCy if not already installed
-try:
-    import spacy
-except ImportError:
-    subprocess.run(["pip", "install", "spacy"])
-    import spacy
+# Function to check and install required packages if they are missing
+def install_package(package_name):
+    try:
+        importlib.import_module(package_name)
+    except ImportError:
+        subprocess.run(["pip", "install", package_name])
+
+# Ensure necessary packages are installed
+install_package("sympy")
+install_package("spacy")
+
+# Import required libraries after ensuring installation
+import sympy as sp
+import spacy
+from sympy import symbols, solve, diff, integrate
 
 # Download spaCy model if not already installed
 try:
@@ -70,7 +78,7 @@ def integrate_expression(expr, var):
 def math_chatbot(query):
     math_operation = parse_math_query(query)
     
-    # Extract the mathematical expression from the query (simple split logic)
+    # Extract the mathematical expression from the query (using simple split logic)
     expression = query.split(" ")[-1]  # Extract the last part of the query as the expression
     
     if math_operation == "solve":
