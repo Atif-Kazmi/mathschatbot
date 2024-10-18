@@ -2,13 +2,13 @@ import subprocess
 import importlib
 import streamlit as st
 
-# Function to install a package if it's not already installed
+# Function to install missing packages if not already installed
 def install_package(package_name):
     try:
         importlib.import_module(package_name)
     except ImportError:
         subprocess.run([f"pip", "install", package_name])
-        # We won't try to re-import immediately after installation.
+        importlib.import_module(package_name)  # Re-import after installation
 
 # Ensure necessary libraries are installed
 install_package("sympy")
@@ -16,20 +16,53 @@ install_package("spacy")
 
 # Import after ensuring installation
 import sympy as sp
-import spacy
 from sympy import symbols, solve, diff, integrate
 
-# Download spaCy model if not already installed
+# Download the spaCy language model for text processing (if necessary)
 try:
-    nlp = spacy.load('en_core_web_sm')
+    import spacy
+    nlp = spacy.load("en_core_web_sm")
 except OSError:
     subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
-    nlp = spacy.load('en_core_web_sm')
+    nlp = spacy.load("en_core_web_sm")
 
 # Define symbolic variable for math operations
 x = symbols('x')
 
-# Function to determine what the user wants to do
+# Function to evaluate mathematical expressions
+def evaluate_expression(expr):
+    try:
+        result = sp.sympify(expr)
+        return result
+    except Exception as e:
+        return f"Error: Invalid expression - {e}"
+
+# Function to solve equations
+def solve_equation(equation, var):
+    try:
+        equation = equation.replace("=", "-")  # Adjust the format for solving
+        sol = solve(equation, var)
+        return sol
+    except Exception as e:
+        return f"Error: Could not solve - {e}"
+
+# Function to differentiate expressions
+def differentiate_expression(expr, var):
+    try:
+        derivative = diff(expr, var)
+        return derivative
+    except Exception as e:
+        return f"Error: Could not differentiate - {e}"
+
+# Function to integrate expressions
+def integrate_expression(expr, var):
+    try:
+        integral = integrate(expr, var)
+        return integral
+    except Exception as e:
+        return f"Error: Could not integrate - {e}"
+
+# Function to determine the type of math operation from user input
 def parse_math_query(query):
     if "solve" in query:
         return "solve"
@@ -39,39 +72,6 @@ def parse_math_query(query):
         return "integrate"
     else:
         return "evaluate"
-
-# Function to evaluate expressions like "x^2 + 2x"
-def evaluate_expression(expr):
-    try:
-        result = sp.sympify(expr)
-        return result
-    except Exception as e:
-        return f"Error: Invalid expression - {e}"
-
-# Function to solve equations like "x^2 + 2x - 3 = 0"
-def solve_equation(equation, var):
-    try:
-        equation = equation.replace("=", "-")  # Adjust the format for solving
-        sol = solve(equation, var)
-        return sol
-    except Exception as e:
-        return f"Error: Could not solve - {e}"
-
-# Function to differentiate expressions like "x^2"
-def differentiate_expression(expr, var):
-    try:
-        derivative = diff(expr, var)
-        return derivative
-    except Exception as e:
-        return f"Error: Could not differentiate - {e}"
-
-# Function to integrate expressions like "x^2"
-def integrate_expression(expr, var):
-    try:
-        integral = integrate(expr, var)
-        return integral
-    except Exception as e:
-        return f"Error: Could not integrate - {e}"
 
 # Main chatbot function to handle user queries
 def math_chatbot(query):
