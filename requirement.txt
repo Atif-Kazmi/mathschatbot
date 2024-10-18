@@ -1,3 +1,1 @@
-pip install sympy
-pip install spacy
-source venv/bin/activate
+
