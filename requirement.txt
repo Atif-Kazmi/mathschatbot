@@ -1,2 +1,6 @@
 pip install streamlit sympy numpy spacy
 python -m spacy download en_core_web_sm  # Download spaCy English model
+mount | grep /mount/admin
+sudo mount /dev/[your-device] /mount/admin
+echo $INSTALL_PATH
+export INSTALL_PATH=/correct/path/to/install
