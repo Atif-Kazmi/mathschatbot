@@ -1,2 +1,2 @@
-sympy
-spacy
+pip install sympy
+pip install spacy
