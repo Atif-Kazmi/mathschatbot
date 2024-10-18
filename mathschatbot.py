@@ -2,19 +2,19 @@ import subprocess
 import importlib
 import streamlit as st
 
-# Function to check if a package is installed, and install it if missing
+# Function to install a package if it's not already installed
 def install_package(package_name):
     try:
         importlib.import_module(package_name)
     except ImportError:
-        subprocess.run(["pip", "install", package_name])
-        importlib.import_module(package_name)  # Re-import after installation
+        subprocess.run([f"pip", "install", package_name])
+        # We won't try to re-import immediately after installation.
 
-# Ensure SymPy and spaCy are installed
+# Ensure necessary libraries are installed
 install_package("sympy")
 install_package("spacy")
 
-# Import necessary libraries after ensuring installation
+# Import after ensuring installation
 import sympy as sp
 import spacy
 from sympy import symbols, solve, diff, integrate
