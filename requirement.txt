@@ -1,4 +1,4 @@
-##pip install streamlit sympy spacy
+pip install streamlit sympy spacy
 python -m spacy download en_core_web_sm
 .\path\to\your\venv\Scripts\Activate  # For Windows
 pip install sympy
