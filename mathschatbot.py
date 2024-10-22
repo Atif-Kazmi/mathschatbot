@@ -1,79 +1,40 @@
+# Install dependencies: Run this in your terminal before running the script
+# pip install openai streamlit
+
+import openai
 import streamlit as st
-import sympy as sp
-from sympy import symbols, solve, diff, integrate
 
-# Define symbolic variable for math operations
-x = symbols('x')
+# Set your OpenAI API key
+openai.api_key = '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'
 
-# Function to evaluate mathematical expressions
-def evaluate_expression(expr):
+# Function to handle mathematical questions
+def math_chatbot(question):
     try:
-        result = sp.sympify(expr)
-        return result
+        # Call the OpenAI API to get the answer
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",  # or "gpt-4" if you have access
+            messages=[
+                {"role": "user", "content": question}
+            ]
+        )
+        # Extract the response text
+        answer = response['choices'][0]['message']['content']
     except Exception as e:
-        return f"Error: Invalid expression - {e}"
+        answer = f"Error: {e}"
 
-# Function to solve equations
-def solve_equation(equation, var):
-    try:
-        equation = equation.replace("=", "-")  # Adjust the format for solving
-        sol = solve(equation, var)
-        return sol
-    except Exception as e:
-        return f"Error: Could not solve - {e}"
+    return answer
 
-# Function to differentiate expressions
-def differentiate_expression(expr, var):
-    try:
-        derivative = diff(expr, var)
-        return derivative
-    except Exception as e:
-        return f"Error: Could not differentiate - {e}"
+# Streamlit app
+st.title("Math Chatbot")
+st.write("Ask any mathematical question and get an answer from the OpenAI model.")
 
-# Function to integrate expressions
-def integrate_expression(expr, var):
-    try:
-        integral = integrate(expr, var)
-        return integral
-    except Exception as e:
-        return f"Error: Could not integrate - {e}"
+# Input box for the question
+question = st.text_input("Enter your mathematical question:", "")
 
-# Function to determine the type of math operation from user input
-def parse_math_query(query):
-    if "solve" in query:
-        return "solve"
-    elif "differentiate" in query or "derivative" in query:
-        return "differentiate"
-    elif "integrate" in query or "integral" in query:
-        return "integrate"
+# Button to submit the question
+if st.button("Get Answer"):
+    if question.strip() != "":
+        answer = math_chatbot(question)
+        st.write(f"**Answer:** {answer}")
     else:
-        return "evaluate"
-
-# Main chatbot function to handle user queries
-def math_chatbot(query):
-    math_operation = parse_math_query(query)
-    
-    # Extract the mathematical expression from the query (simple split logic)
-    expression = query.split(" ")[-1]  # Extract the last part of the query as the expression
-    
-    if math_operation == "solve":
-        return solve_equation(expression, x)
-    elif math_operation == "differentiate":
-        return differentiate_expression(expression, x)
-    elif math_operation == "integrate":
-        return integrate_expression(expression, x)
-    else:
-        return evaluate_expression(expression)
-
-# Streamlit UI Setup
-st.title("Mathematics Solver Chatbot")
-st.write("Ask me to solve, differentiate, integrate, or evaluate math expressions!")
-
-# Input box for user queries
-user_input = st.text_input("Enter your math problem (e.g., solve x^2 + 2x - 3 = 0)")
-
-# When the user provides input, process the query
-if user_input:
-    st.write(f"Your query: {user_input}")
-    result = math_chatbot(user_input)
-    st.write(f"Result: {result}")
+        st.write("Please enter a valid question.")
